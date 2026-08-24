@@ -1525,6 +1525,14 @@ with centered_section("diagnosis-section"):
             style = VERDICT_STYLE[result["tier"]]
             verdict_label = T["result"]["verdicts"][result["tier"]]
 
+            _, result_action, _ = build_recommendation(
+                result["tier"],
+                result["image_fmd_prob"],
+                result["symptom_prob"],
+                result["governorate_text"],
+                LANG,
+            )
+
             # --- الصورة اللى اتبعتت + بطاقة النتيجة ---
             first_image_bytes = st.session_state.uploaded_images[0]["bytes"]
             img_b64 = base64.b64encode(first_image_bytes).decode()
@@ -1542,6 +1550,14 @@ with centered_section("diagnosis-section"):
                 f'<div class="result-verdict" style="color:{style["color"]};">{style["icon"]} {verdict_label}</div>',
                 unsafe_allow_html=True,
             )
+            st.markdown(f"""
+                <div class="vet-box vet-actions">
+                    <h4>✅ Recommended Actions</h4>
+                    <p>
+                        {result_action.replace(chr(10), "<br>")}
+                    </p>
+                </div>
+            """, unsafe_allow_html=True)
             st.markdown(f"""
                 <div class="result-meta">
                     <span></span>
