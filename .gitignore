@@ -12,8 +12,3 @@ test.py
 
 .DS_Store
 
-# Data files
-data/
-
-# Model files
-models/
