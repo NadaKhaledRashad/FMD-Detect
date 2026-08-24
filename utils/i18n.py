@@ -28,7 +28,7 @@ TRANSLATIONS = {
 
         "hero": {
             "title": "FMD DETECTION",
-            "slogan": "\u201cOur Wealth is Animal Health\u201d",
+            "slogan": "\u201cOur Wealth is Animals Health\u201d",
             "sub": "AI-Powered Early Detection System",
             "cta": "🚀 Start Diagnosis",
         },
