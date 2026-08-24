@@ -1,0 +1,1527 @@
+<!DOCTYPE html>
+<!-- saved from url=(0110)https://lms.digilians.gov.eg/pluginfile.php/16366/mod_resource/content/1/DL_Test_Your_Understanding_Week4.html -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Deep Learning Quiz: Optimizers &amp; Hyperparameter Tuning</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(145deg, #f5f7fc 0%, #eef2f8 100%);
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            padding: 2rem 1.5rem;
+            color: #1a2634;
+        }
+
+        .quiz-header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        .quiz-header h1 {
+            font-size: 2.2rem;
+            background: linear-gradient(135deg, #1f2b3c, #2c3e50);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            letter-spacing: -0.3px;
+            font-weight: 700;
+        }
+
+        .quiz-header p {
+            color: #4a627a;
+            margin-top: 0.5rem;
+            font-weight: 500;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .badge {
+            background: #d4e0f0;
+            display: inline-block;
+            padding: 0.25rem 0.9rem;
+            border-radius: 40px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #1f4973;
+            margin-top: 0.75rem;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            background: rgba(255,255,255,0.6);
+            border-radius: 2rem;
+            backdrop-filter: blur(1px);
+            padding: 1.8rem 2rem;
+            box-shadow: 0 20px 35px -12px rgba(0,0,0,0.1);
+        }
+
+        .quiz-card {
+            display: flex;
+            flex-direction: column;
+            gap: 1.75rem;
+        }
+
+        .question-item {
+            background: white;
+            border-radius: 1.5rem;
+            padding: 1.3rem 1.8rem;
+            box-shadow: 0 5px 12px rgba(0,0,0,0.03), 0 1px 2px rgba(0,0,0,0.05);
+            transition: all 0.2s;
+            border: 1px solid #e9edf2;
+        }
+
+        .question-text {
+            font-weight: 700;
+            font-size: 1.08rem;
+            color: #0f2b42;
+            margin-bottom: 1rem;
+            padding-right: 0.5rem;
+            line-height: 1.4;
+        }
+
+        .options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.9rem 1.8rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .option-label {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            cursor: pointer;
+            font-size: 0.94rem;
+            background: #f9fafc;
+            padding: 0.4rem 1rem 0.4rem 0.8rem;
+            border-radius: 2rem;
+            transition: background 0.15s;
+            border: 1px solid #e2e7ef;
+        }
+
+        .option-label:hover {
+            background: #eef3fc;
+            border-color: #bdd4e8;
+        }
+
+        input[type="radio"] {
+            accent-color: #2c6e9e;
+            width: 1rem;
+            height: 1rem;
+            margin: 0;
+        }
+
+        .feedback-area {
+            margin-top: 1rem;
+            padding-top: 0.6rem;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: #2c3e66;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .feedback-correct {
+            color: #117f4a;
+            background: #e0f2e9;
+            padding: 0.25rem 0.8rem;
+            border-radius: 30px;
+            display: inline-block;
+        }
+
+        .feedback-wrong {
+            color: #b13e3e;
+            background: #ffe6e5;
+            padding: 0.25rem 0.8rem;
+            border-radius: 30px;
+            display: inline-block;
+        }
+
+        .score-panel {
+            margin-top: 2rem;
+            display: flex;
+            justify-content: center;
+        }
+
+        .btn-score {
+            background: #1f4973;
+            border: none;
+            color: white;
+            font-weight: 700;
+            font-size: 1.2rem;
+            padding: 0.9rem 2.5rem;
+            border-radius: 60px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.7rem;
+            transition: all 0.2s;
+            box-shadow: 0 5px 12px rgba(0,32,64,0.2);
+            border: 1px solid #2c628b;
+        }
+
+        .btn-score:hover {
+            background: #0e3a5c;
+            transform: scale(1.02);
+            box-shadow: 0 8px 18px rgba(0,0,0,0.15);
+        }
+
+        .final-score-container {
+            background: #f0f4fa;
+            border-radius: 2rem;
+            margin-top: 1.8rem;
+            padding: 1.2rem;
+            text-align: center;
+            font-weight: 700;
+            font-size: 1.4rem;
+            color: #1a4972;
+            border: 1px solid #cddfef;
+        }
+
+        hr {
+            margin: 0.5rem 0;
+            border-color: #e2edf7;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 2.2rem;
+            font-size: 0.8rem;
+            color: #5a6e82;
+        }
+
+        @media (max-width: 720px) {
+            body {
+                padding: 1rem;
+            }
+            .container {
+                padding: 1rem;
+            }
+            .question-item {
+                padding: 1rem;
+            }
+            .options {
+                gap: 0.6rem;
+            }
+            .option-label {
+                font-size: 0.85rem;
+                padding: 0.3rem 0.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="quiz-header">
+    <h1>📘 Advanced Optimizers &amp; Hyperparameter Tuning</h1>
+    <p>40 MCQs covering Momentum, RMSProp, Adam, EWA, Grid/Random Search, Regularization, and practical guidelines</p>
+    <div class="badge">🎯 Test your knowledge • Deep Learning Week 4</div>
+</div>
+<div class="container">
+    <div class="quiz-card" id="quizContainer">
+            <div class="question-item" id="question-0" data-qidx="0">
+                <div class="question-text">1. What is a key limitation of standard Mini-Batch Gradient Descent?</div>
+                <div class="options">
+                    
+                <label class="option-label">
+                    <input type="radio" name="q0" value="0">
+                    <span>A. Noisy oscillations in loss landscape</span>
+                </label>
+            
+                <label class="option-label">
+                    <input type="radio" name="q0" value="1">
+                    <span>B. Fixed learning rate for all parameters</span>
+                </label>
+            
+                <label class="option-label">
+                    <input type="radio" name="q0" value="2">
+                    <span>C. May get trapped in local minima or plateaus</span>
+                </label>
+            
+                <label class="option-label">
+                    <input type="radio" name="q0" value="3">
+                    <span>D. All of the above</span>
+                </label>
+            
+                </div>
+                <div class="feedback-area" id="fb-0" style="display: flex;"><span class="feedback-correct">💡 ✓ Correct! All of the above is right.</span></div>
+            </div>
+        
+            <div class="question-item" id="question-1" data-qidx="1">
+                <div class="question-text">2. Exponentially Weighted Averages (EWA) in advanced optimizers help to:</div>
+                <div class="options">
+                    
+                <label class="option-label">
+                    <input type="radio" name="q1" value="0">
+                    <span>A. Increase the learning rate adaptively</span>
+                </label>
+            
+                <label class="option-label">
+                    <input type="radio" name="q1" value="1">
+                    <span>B. Smooth out noisy gradients and reveal underlying trend</span>
+                </label>
+            
+                <label class="option-label">
+                    <input type="radio" name="q1" value="2">
+                    <span>C. Eliminate the need for bias correction</span>
+                </label>
+            
+                <label class="option-label">
+                    <input type="radio" name="q1" value="3">
+                    <span>D. Only work with RMSProp</span>
+                </label>
+            
+                </div>
+                <div class="feedback-area" id="fb-1" style="display: flex;"><span class="feedback-correct">💡 ✓ Correct! Smooth out noisy gradients and reveal underlying trend is right.</span></div>
+            </div>
+        
+            <div class="question-item" id="question-2" data-qidx="2">
+                <div class="question-text">3. In the Momentum algorithm, the update rule uses v_dw = β v_dw + (1-β) dW. What does β control?</div>
+                <div class="options">
+                    
+                <label class="option-label">
+                    <input type="radio" name="q2" value="0">
+                    <span>A. The learning rate decay</span>
+                </label>
+            
+                <label class="option-label">
+                    <input type="radio" name="q2" value="1">
+                    <span>B. Weight given to past gradients (smoothing factor)</span>
+                </label>
+            
+                <label class="option-label">
+                    <input type="radio" name="q2" value="2">
+                    <span>C. Second moment accumulation</span>
+                </label>
+            
+                <label class="option-label">
+                    <input type="radio" name="q2" value="3">
+                    <span>D. Adaptive per-parameter scaling</span>
+                </label>
+            
+                </div>
+                <div class="feedback-area" id="fb-2" style="display: flex;"><span class="feedback-correct">💡 ✓ Correct! Weight given to past gradients (smoothing factor) is right.</span></div>
+            </div>
+        
+            <div class="question-item" id="question-3" data-qidx="3">
+                <div class="question-text">4. What is a typical default value for the momentum term β (beta) in practice?</div>
+                <div class="options">
+                    
+                <label class="option-label">
+                    <input type="radio" name="q3" value="0">
+                    <span>A. 0.5</span>
+                </label>
+            
+                <label class="option-label">
+                    <input type="radio" name="q3" value="1">
+                    <span>B. 0.99</span>
+                </label>
+            
+                <label class="option-label">
+                    <input type="radio" name="q3" value="2">
+                    <span>C. 0.9</span>
+                </label>
+            
+                <label class="option-label">
+                    <input type="radio" name="q3" value="3">
+                    <span>D. 0.999</span>
+                </label>
+            
+                </div>
+                <div class="feedback-area" id="fb-3" style="display: flex;"><span class="feedback-correct">💡 ✓ Correct! 0.9 is right.</span></div>
+            </div>
+        
+            <div class="question-item" id="question-4" data-qidx="4">
+                <div class="question-text">5. RMSProp (Root Mean Square Propagation) adapts learning rates by maintaining:</div>
+                <div class="options">
+                    
+                <label class="option-label">
+                    <input type="radio" name="q4" value="0">
+                    <span>A. A moving average of raw gradients</span>
+                </label>
+            
+                <label class="option-label">
+                    <input type="radio" name="q4" value="1">
+                    <span>B. A moving average of squared gradients</span>
+                </label>
+            
+                <label class="option-label">
+                    <input type="radio" name="q4" value="2">
+                    <span>C. A moving average of weight updates</span>
+                </label>
+            
+                <label class="option-label">
+                    <input type="radio" name="q4" value="3">
+                    <span>D. A single global learning rate schedule</span>
+                </label>
+            
+                </div>
+                <div class="feedback-area" id="fb-4" style="display: flex;"><span class="feedback-correct">💡 ✓ Correct! A moving average of squared gradients is right.</span></div>
+            </div>
+        
+            <div class="question-item" id="question-5" data-qidx="5">
+                <div class="question-text">6. In RMSProp, when a parameter has a consistently large gradient, the effective update step will:</div>
+                <div class="options">
+                    
+                <label class="option-label">
+                    <input type="radio" name="q5" value="0">
+                    <span>A. Become larger to escape plateau</span>
+                </label>
+            
+                <label class="option-label">
+                    <input type="radio" name="q5" value="1">
+                    <span>B. Remain unchanged</span>
+                </label>
+            
+                <label class="option-label">
+                    <input type="radio" name="q5" value="2">
+                    <span>C. Be scaled down (smaller step)</span>
+                </label>
+            
+                <label class="option-label">
+                    <input type="radio" name="q5" value="3">
+                    <span>D. Oscillate heavily</span>
+                </label>
+            
+                </div>
+                <div class="feedback-area" id="fb-5" style="display: flex;"><span class="feedback-wrong">💡 ✗ Wrong. Your answer: "Become larger to escape plateau". Correct: Be scaled down (smaller step).</span></div>
+            </div>
+        
+            <div class="question-item" id="question-6" data-qidx="6">
+                <div class="question-text">7. Which two optimization techniques does Adam combine to achieve robust performance?</div>
+                <div class="options">
+                    
+                <label class="option-label">
+                    <input type="radio" name="q6" value="0">
+                    <span>A. SGD + Mini-batch</span>
+                </label>
+            
+                <label class="option-label">
+                    <input type="radio" name="q6" value="1">
+                    <span>B. Momentum + RMSProp</span>
+                </label>
+            
+                <label class="option-label">
+                    <input type="radio" name="q6" value="2">
+                    <span>C. NAG + AdaGrad</span>
+                </label>
+            
+                <label class="option-label">
+                    <input type="radio" name="q6" value="3">
+                    <span>D. EWA + gradient clipping</span>
+                </label>
+            
+                </div>
+                <div class="feedback-area" id="fb-6" style="display: flex;"><span class="feedback-correct">💡 ✓ Correct! Momentum + RMSProp is right.</span></div>
+            </div>
+        
+            <div class="question-item" id="question-7" data-qidx="7">
+                <div class="question-text">8. In Adam, the first moment (v_dw) represents:</div>
+                <div class="options">
+                    
+                <label class="option-label">
+                    <input type="radio" name="q7" value="0">
+                    <span>A. The exponentially weighted average of gradients (mean)</span>
+                </label>
+            
+                <label class="option-label">
+                    <input type="radio" name="q7" value="1">
+                    <span>B. The exponentially weighted average of squared gradients</span>
+                </label>
+            
+                <label class="option-label">
+                    <input type="radio" name="q7" value="2">
+                    <span>C. The bias-corrected learning rate</span>
+                </label>
+            
+                <label class="option-label">
+                    <input type="radio" name="q7" value="3">
+                    <span>D. The second raw moment</span>
+                </label>
+            
+                </div>
+                <div class="feedback-area" id="fb-7" style="display: flex;"><span class="feedback-correct">💡 ✓ Correct! The exponentially weighted average of gradients (mean) is right.</span></div>
+            </div>
+        
+            <div class="question-item" id="question-8" data-qidx="8">
+                <div class="question-text">9. Why does Adam include a bias correction step?</div>
+                <div class="options">
+                    
+                <label class="option-label">
+                    <input type="radio" name="q8" value="0">
+                    <span>A. To increase learning rate after each epoch</span>
+                </label>
+            
+                <label class="option-label">
+                    <input type="radio" name="q8" value="1">
+                    <span>B. To correct for initial zero initialization of moments</span>
+                </label>
+            
+                <label class="option-label">
+                    <input type="radio" name="q8" value="2">
+                    <span>C. To prevent overfitting</span>
+                </label>
+            
+                <label class="option-label">
+                    <input type="radio" name="q8" value="3">
+                    <span>D. To normalize input features</span>
+                </label>
+            
+                </div>
+                <div class="feedback-area" id="fb-8" style="display: flex;"><span class="feedback-correct">💡 ✓ Correct! To correct for initial zero initialization of moments is right.</span></div>
+            </div>
+        
+            <div class="question-item" id="question-9" data-qidx="9">
+                <div class="question-text">10. According to practical recommendations, what is the best default optimizer when starting a new deep learning project?</div>
+                <div class="options">
+                    
+                <label class="option-label">
+                    <input type="radio" name="q9" value="0">
+                    <span>A. SGD with classical momentum</span>
+                </label>
+            
+                <label class="option-label">
+                    <input type="radio" name="q9" value="1">
+                    <span>B. RMSProp</span>
+                </label>
+            
+                <label class="option-label">
+                    <input type="radio" name="q9" value="2">
+                    <span>C. Adam</span>
+                </label>
+            
+                <label class="option-label">
+                    <input type="radio" name="q9" value="3">
+                    <span>D. AdaGrad</span>
+                </label>
+            
+                </div>
+                <div class="feedback-area" id="fb-9" style="display: flex;"><span class="feedback-correct">💡 ✓ Correct! Adam is right.</span></div>
+            </div>
+        
+            <div class="question-item" id="question-10" data-qidx="10">
+                <div class="question-text">11. Which of the following is true regarding Adam vs SGD with Momentum?</div>
+                <div class="options">
+                    
+                <label class="option-label">
+                    <input type="radio" name="q10" value="0">
+                    <span>A. Adam always generalizes better on every task</span>
+                </label>
+            
+                <label class="option-label">
+                    <input type="radio" name="q10" value="1">
+                    <span>B. SGD with Momentum can sometimes generalize better when fine-tuned</span>
+                </label>
+            
+                <label class="option-label">
+                    <input type="radio" name="q10" value="2">
+                    <span>C. Adam never requires learning rate tuning</span>
+                </label>
+            
+                <label class="option-label">
+                    <input type="radio" name="q10" value="3">
+                    <span>D. Momentum is always faster than Adam</span>
+                </label>
+            
+                </div>
+                <div class="feedback-area" id="fb-10" style="display: flex;"><span class="feedback-correct">💡 ✓ Correct! SGD with Momentum can sometimes generalize better when fine-tuned is right.</span></div>
+            </div>
+        
+            <div class="question-item" id="question-11" data-qidx="11">
+                <div class="question-text">12. The primary benefit of Momentum over vanilla GD is:</div>
+                <div class="options">
+                    
+                <label class="option-label">
+                    <input type="radio" name="q11" value="0">
+                    <span>A. It eliminates local minima entirely</span>
+                </label>
+            
+                <label class="option-label">
+                    <input type="radio" name="q11" value="1">
+                    <span>B. It accelerates convergence and dampens oscillations</span>
+                </label>
+            
+                <label class="option-label">
+                    <input type="radio" name="q11" value="2">
+                    <span>C. It automatically adjusts batch size</span>
+                </label>
+            
+                <label class="option-label">
+                    <input type="radio" name="q11" value="3">
+                    <span>D. It works only with convex functions</span>
+                </label>
+            
+                </div>
+                <div class="feedback-area" id="fb-11" style="display: flex;"><span class="feedback-correct">💡 ✓ Correct! It accelerates convergence and dampens oscillations is right.</span></div>
+            </div>
+        
+            <div class="question-item" id="question-12" data-qidx="12">
+                <div class="question-text">13. When framing hyperparameter tuning as optimizing a black-box function f(x), the output f(x) is typically:</div>
+                <div class="options">
+                    
+                <label class="option-label">
+                    <input type="radio" name="q12" value="0">
+                    <span>A. The number of model parameters</span>
+                </label>
+            
+                <label class="option-label">
+                    <input type="radio" name="q12" value="1">
+                    <span>B. Validation accuracy or validation loss</span>
+                </label>
+            
+                <label class="option-label">
+                    <input type="radio" name="q12" value="2">
+                    <span>C. Training accuracy only</span>
+                </label>
+            
+                <label class="option-label">
+                    <input type="radio" name="q12" value="3">
+                    <span>D. Gradient norm</span>
+                </label>
+            
+                </div>
+                <div class="feedback-area" id="fb-12" style="display: flex;"><span class="feedback-correct">💡 ✓ Correct! Validation accuracy or validation loss is right.</span></div>
+            </div>
+        
+            <div class="question-item" id="question-13" data-qidx="13">
+                <div class="question-text">14. What is the 'curse of dimensionality' in the context of Grid Search?</div>
+                <div class="options">
+                    
+                <label class="option-label">
+                    <input type="radio" name="q13" value="0">
+                    <span>A. Models become too deep</span>
+                </label>
+            
+                <label class="option-label">
+                    <input type="radio" name="q13" value="1">
+                    <span>B. The number of hyperparameter combinations grows exponentially with dimensions</span>
+                </label>
+            
+                <label class="option-label">
+                    <input type="radio" name="q13" value="2">
+                    <span>C. Grid search uses random sampling</span>
+                </label>
+            
+                <label class="option-label">
+                    <input type="radio" name="q13" value="3">
+                    <span>D. Overfitting due to too many features</span>
+                </label>
+            
+                </div>
+                <div class="feedback-area" id="fb-13" style="display: flex;"><span class="feedback-correct">💡 ✓ Correct! The number of hyperparameter combinations grows exponentially with dimensions is right.</span></div>
+            </div>
+        
+            <div class="question-item" id="question-14" data-qidx="14">
+                <div class="question-text">15. Compared to Grid Search, Random Search is often more efficient because:</div>
+                <div class="options">
+                    
+                <label class="option-label">
+                    <input type="radio" name="q14" value="0">
+                    <span>A. It tries every possible combination</span>
+                </label>
+            
+                <label class="option-label">
+                    <input type="radio" name="q14" value="1">
+                    <span>B. It explores more distinct values for important hyperparameters without wasting runs</span>
+                </label>
+            
+                <label class="option-label">
+                    <input type="radio" name="q14" value="2">
+                    <span>C. It uses gradient information</span>
+                </label>
+            
+                <label class="option-label">
+                    <input type="radio" name="q14" value="3">
+                    <span>D. It requires fewer epochs per run</span>
+                </label>
+            
+                </div>
+                <div class="feedback-area" id="fb-14" style="display: flex;"><span class="feedback-correct">💡 ✓ Correct! It explores more distinct values for important hyperparameters without wasting runs is right.</span></div>
+            </div>
+        
+            <div class="question-item" id="question-15" data-qidx="15">
+                <div class="question-text">16. Why is it recommended to sample hyperparameters like learning rate on a logarithmic scale (e.g., 10^{-4} to 10^{-1})?</div>
+                <div class="options">
+                    
+                <label class="option-label">
+                    <input type="radio" name="q15" value="0">
+                    <span>A. Because learning rates are always negative</span>
+                </label>
+            
+                <label class="option-label">
+                    <input type="radio" name="q15" value="1">
+                    <span>B. Because the impact of changes is multiplicative, not linear</span>
+                </label>
+            
+                <label class="option-label">
+                    <input type="radio" name="q15" value="2">
+                    <span>C. To reduce computational cost</span>
+                </label>
+            
+                <label class="option-label">
+                    <input type="radio" name="q15" value="3">
+                    <span>D. Because grid search becomes feasible</span>
+                </label>
+            
+                </div>
+                <div class="feedback-area" id="fb-15" style="display: flex;"><span class="feedback-correct">💡 ✓ Correct! Because the impact of changes is multiplicative, not linear is right.</span></div>
+            </div>
+        
+            <div class="question-item" id="question-16" data-qidx="16">
+                <div class="question-text">17. Which regularization technique randomly deactivates neurons with a certain probability during training to improve generalization?</div>
+                <div class="options">
+                    
+                <label class="option-label">
+                    <input type="radio" name="q16" value="0">
+                    <span>A. L2 regularization</span>
+                </label>
+            
+                <label class="option-label">
+                    <input type="radio" name="q16" value="1">
+                    <span>B. Dropout</span>
+                </label>
+            
+                <label class="option-label">
+                    <input type="radio" name="q16" value="2">
+                    <span>C. Early stopping</span>
+                </label>
+            
+                <label class="option-label">
+                    <input type="radio" name="q16" value="3">
+                    <span>D. Data augmentation</span>
+                </label>
+            
+                </div>
+                <div class="feedback-area" id="fb-16" style="display: flex;"><span class="feedback-wrong">💡 ✗ Wrong. Your answer: "L2 regularization". Correct: Dropout.</span></div>
+            </div>
+        
+            <div class="question-item" id="question-17" data-qidx="17">
+                <div class="question-text">18. L2 regularization (weight decay) works by:</div>
+                <div class="options">
+                    
+                <label class="option-label">
+                    <input type="radio" name="q17" value="0">
+                    <span>A. Adding penalty on absolute weights</span>
+                </label>
+            
+                <label class="option-label">
+                    <input type="radio" name="q17" value="1">
+                    <span>B. Adding penalty on squared weights to the loss function</span>
+                </label>
+            
+                <label class="option-label">
+                    <input type="radio" name="q17" value="2">
+                    <span>C. Randomly dropping connections</span>
+                </label>
+            
+                <label class="option-label">
+                    <input type="radio" name="q17" value="3">
+                    <span>D. Stopping training early</span>
+                </label>
+            
+                </div>
+                <div class="feedback-area" id="fb-17" style="display: flex;"><span class="feedback-correct">💡 ✓ Correct! Adding penalty on squared weights to the loss function is right.</span></div>
+            </div>
+        
+            <div class="question-item" id="question-18" data-qidx="18">
+                <div class="question-text">19. Early stopping is a regularization strategy that:</div>
+                <div class="options">
+                    
+                <label class="option-label">
+                    <input type="radio" name="q18" value="0">
+                    <span>A. Stops training when validation performance stops improving</span>
+                </label>
+            
+                <label class="option-label">
+                    <input type="radio" name="q18" value="1">
+                    <span>B. Stops after fixed number of epochs</span>
+                </label>
+            
+                <label class="option-label">
+                    <input type="radio" name="q18" value="2">
+                    <span>C. Reduces learning rate to zero</span>
+                </label>
+            
+                <label class="option-label">
+                    <input type="radio" name="q18" value="3">
+                    <span>D. Increases batch size</span>
+                </label>
+            
+                </div>
+                <div class="feedback-area" id="fb-18" style="display: flex;"><span class="feedback-correct">💡 ✓ Correct! Stops training when validation performance stops improving is right.</span></div>
+            </div>
+        
+            <div class="question-item" id="question-19" data-qidx="19">
+                <div class="question-text">20. Data augmentation improves model performance by:</div>
+                <div class="options">
+                    
+                <label class="option-label">
+                    <input type="radio" name="q19" value="0">
+                    <span>A. Increasing model size</span>
+                </label>
+            
+                <label class="option-label">
+                    <input type="radio" name="q19" value="1">
+                    <span>B. Adding noise to labels</span>
+                </label>
+            
+                <label class="option-label">
+                    <input type="radio" name="q19" value="2">
+                    <span>C. Creating modified versions of training samples to increase diversity</span>
+                </label>
+            
+                <label class="option-label">
+                    <input type="radio" name="q19" value="3">
+                    <span>D. Doubling the learning rate</span>
+                </label>
+            
+                </div>
+                <div class="feedback-area" id="fb-19" style="display: flex;"><span class="feedback-correct">💡 ✓ Correct! Creating modified versions of training samples to increase diversity is right.</span></div>
+            </div>
+        
+            <div class="question-item" id="question-20" data-qidx="20">
+                <div class="question-text">21. A higher β value (closer to 1) in Exponentially Weighted Averages leads to:</div>
+                <div class="options">
+                    
+                <label class="option-label">
+                    <input type="radio" name="q20" value="0">
+                    <span>A. More noisy moving average</span>
+                </label>
+            
+                <label class="option-label">
+                    <input type="radio" name="q20" value="1">
+                    <span>B. Smoother moving average, more weight on past values</span>
+                </label>
+            
+                <label class="option-label">
+                    <input type="radio" name="q20" value="2">
+                    <span>C. Faster adaptation to recent gradients</span>
+                </label>
+            
+                <label class="option-label">
+                    <input type="radio" name="q20" value="3">
+                    <span>D. No effect</span>
+                </label>
+            
+                </div>
+                <div class="feedback-area" id="fb-20" style="display: flex;"><span class="feedback-correct">💡 ✓ Correct! Smoother moving average, more weight on past values is right.</span></div>
+            </div>
+        
+            <div class="question-item" id="question-21" data-qidx="21">
+                <div class="question-text">22. In Momentum algorithm, the weight update formula is W = W - α * v_dw. v_dw is:</div>
+                <div class="options">
+                    
+                <label class="option-label">
+                    <input type="radio" name="q21" value="0">
+                    <span>A. Current gradient</span>
+                </label>
+            
+                <label class="option-label">
+                    <input type="radio" name="q21" value="1">
+                    <span>B. Moving average of gradients</span>
+                </label>
+            
+                <label class="option-label">
+                    <input type="radio" name="q21" value="2">
+                    <span>C. Squared gradient average</span>
+                </label>
+            
+                <label class="option-label">
+                    <input type="radio" name="q21" value="3">
+                    <span>D. Bias-corrected second moment</span>
+                </label>
+            
+                </div>
+                <div class="feedback-area" id="fb-21" style="display: flex;"><span class="feedback-correct">💡 ✓ Correct! Moving average of gradients is right.</span></div>
+            </div>
+        
+            <div class="question-item" id="question-22" data-qidx="22">
+                <div class="question-text">23. RMSProp scales the learning rate by 1 / sqrt(S_dw + ε). Here S_dw is:</div>
+                <div class="options">
+                    
+                <label class="option-label">
+                    <input type="radio" name="q22" value="0">
+                    <span>A. Moving average of raw gradients</span>
+                </label>
+            
+                <label class="option-label">
+                    <input type="radio" name="q22" value="1">
+                    <span>B. Moving average of squared gradients</span>
+                </label>
+            
+                <label class="option-label">
+                    <input type="radio" name="q22" value="2">
+                    <span>C. Exponential decay of weights</span>
+                </label>
+            
+                <label class="option-label">
+                    <input type="radio" name="q22" value="3">
+                    <span>D. Current loss value</span>
+                </label>
+            
+                </div>
+                <div class="feedback-area" id="fb-22" style="display: flex;"><span class="feedback-correct">💡 ✓ Correct! Moving average of squared gradients is right.</span></div>
+            </div>
+        
+            <div class="question-item" id="question-23" data-qidx="23">
+                <div class="question-text">24. The small epsilon (ε) in RMSProp and Adam is used to:</div>
+                <div class="options">
+                    
+                <label class="option-label">
+                    <input type="radio" name="q23" value="0">
+                    <span>A. Speed up convergence</span>
+                </label>
+            
+                <label class="option-label">
+                    <input type="radio" name="q23" value="1">
+                    <span>B. Avoid division by zero and improve numerical stability</span>
+                </label>
+            
+                <label class="option-label">
+                    <input type="radio" name="q23" value="2">
+                    <span>C. Increase momentum</span>
+                </label>
+            
+                <label class="option-label">
+                    <input type="radio" name="q23" value="3">
+                    <span>D. Decay learning rate</span>
+                </label>
+            
+                </div>
+                <div class="feedback-area" id="fb-23" style="display: flex;"><span class="feedback-correct">💡 ✓ Correct! Avoid division by zero and improve numerical stability is right.</span></div>
+            </div>
+        
+            <div class="question-item" id="question-24" data-qidx="24">
+                <div class="question-text">25. What is the main goal of using advanced optimizers (Momentum, RMSProp, Adam) over standard GD?</div>
+                <div class="options">
+                    
+                <label class="option-label">
+                    <input type="radio" name="q24" value="0">
+                    <span>A. To reduce model size</span>
+                </label>
+            
+                <label class="option-label">
+                    <input type="radio" name="q24" value="1">
+                    <span>B. To converge faster and more reliably across loss surfaces</span>
+                </label>
+            
+                <label class="option-label">
+                    <input type="radio" name="q24" value="2">
+                    <span>C. To always escape all local minima</span>
+                </label>
+            
+                <label class="option-label">
+                    <input type="radio" name="q24" value="3">
+                    <span>D. To remove regularization</span>
+                </label>
+            
+                </div>
+                <div class="feedback-area" id="fb-24" style="display: flex;"><span class="feedback-correct">💡 ✓ Correct! To converge faster and more reliably across loss surfaces is right.</span></div>
+            </div>
+        
+            <div class="question-item" id="question-25" data-qidx="25">
+                <div class="question-text">26. Which of the following hyperparameters is NOT typically tuned during hyperparameter optimization?</div>
+                <div class="options">
+                    
+                <label class="option-label">
+                    <input type="radio" name="q25" value="0">
+                    <span>A. Learning rate</span>
+                </label>
+            
+                <label class="option-label">
+                    <input type="radio" name="q25" value="1">
+                    <span>B. Number of hidden layers</span>
+                </label>
+            
+                <label class="option-label">
+                    <input type="radio" name="q25" value="2">
+                    <span>C. Mini-batch size</span>
+                </label>
+            
+                <label class="option-label">
+                    <input type="radio" name="q25" value="3">
+                    <span>D. The exact random seed of each training example (fixed after selection)</span>
+                </label>
+            
+                </div>
+                <div class="feedback-area" id="fb-25" style="display: flex;"><span class="feedback-correct">💡 ✓ Correct! The exact random seed of each training example (fixed after selection) is right.</span></div>
+            </div>
+        
+            <div class="question-item" id="question-26" data-qidx="26">
+                <div class="question-text">27. When using Grid Search, if you have 4 hyperparameters each with 5 possible values, how many model training runs are required?</div>
+                <div class="options">
+                    
+                <label class="option-label">
+                    <input type="radio" name="q26" value="0">
+                    <span>A. 20</span>
+                </label>
+            
+                <label class="option-label">
+                    <input type="radio" name="q26" value="1">
+                    <span>B. 125</span>
+                </label>
+            
+                <label class="option-label">
+                    <input type="radio" name="q26" value="2">
+                    <span>C. 625</span>
+                </label>
+            
+                <label class="option-label">
+                    <input type="radio" name="q26" value="3">
+                    <span>D. 1024</span>
+                </label>
+            
+                </div>
+                <div class="feedback-area" id="fb-26" style="display: flex;"><span class="feedback-correct">💡 ✓ Correct! 625 is right.</span></div>
+            </div>
+        
+            <div class="question-item" id="question-27" data-qidx="27">
+                <div class="question-text">28. Random Search can be more efficient because not all hyperparameters are equally important. Which hyperparameter often has the strongest impact on performance?</div>
+                <div class="options">
+                    
+                <label class="option-label">
+                    <input type="radio" name="q27" value="0">
+                    <span>A. Number of epochs</span>
+                </label>
+            
+                <label class="option-label">
+                    <input type="radio" name="q27" value="1">
+                    <span>B. Learning rate</span>
+                </label>
+            
+                <label class="option-label">
+                    <input type="radio" name="q27" value="2">
+                    <span>C. Dropout rate (if small variation)</span>
+                </label>
+            
+                <label class="option-label">
+                    <input type="radio" name="q27" value="3">
+                    <span>D. Activation function type (minor)</span>
+                </label>
+            
+                </div>
+                <div class="feedback-area" id="fb-27" style="display: flex;"><span class="feedback-correct">💡 ✓ Correct! Learning rate is right.</span></div>
+            </div>
+        
+            <div class="question-item" id="question-28" data-qidx="28">
+                <div class="question-text">29. Which component of the Adam optimizer accounts for adaptive per-parameter learning rates similar to RMSProp?</div>
+                <div class="options">
+                    
+                <label class="option-label">
+                    <input type="radio" name="q28" value="0">
+                    <span>A. First moment estimate</span>
+                </label>
+            
+                <label class="option-label">
+                    <input type="radio" name="q28" value="1">
+                    <span>B. Second moment estimate (uncentered variance)</span>
+                </label>
+            
+                <label class="option-label">
+                    <input type="radio" name="q28" value="2">
+                    <span>C. Bias correction factor</span>
+                </label>
+            
+                <label class="option-label">
+                    <input type="radio" name="q28" value="3">
+                    <span>D. Momentum term only</span>
+                </label>
+            
+                </div>
+                <div class="feedback-area" id="fb-28" style="display: flex;"><span class="feedback-correct">💡 ✓ Correct! Second moment estimate (uncentered variance) is right.</span></div>
+            </div>
+        
+            <div class="question-item" id="question-29" data-qidx="29">
+                <div class="question-text">30. On a loss plateau where gradients are very small, RMSProp and Adam help by:</div>
+                <div class="options">
+                    
+                <label class="option-label">
+                    <input type="radio" name="q29" value="0">
+                    <span>A. Increasing the effective step size because denominator sqrt(S_dw) is small</span>
+                </label>
+            
+                <label class="option-label">
+                    <input type="radio" name="q29" value="1">
+                    <span>B. Reducing step size further</span>
+                </label>
+            
+                <label class="option-label">
+                    <input type="radio" name="q29" value="2">
+                    <span>C. Switching to pure SGD</span>
+                </label>
+            
+                <label class="option-label">
+                    <input type="radio" name="q29" value="3">
+                    <span>D. Stopping training</span>
+                </label>
+            
+                </div>
+                <div class="feedback-area" id="fb-29" style="display: flex;"><span class="feedback-correct">💡 ✓ Correct! Increasing the effective step size because denominator sqrt(S_dw) is small is right.</span></div>
+            </div>
+        
+            <div class="question-item" id="question-30" data-qidx="30">
+                <div class="question-text">31. Which of the following statements about Exponentially Weighted Averages (EWA) is correct?</div>
+                <div class="options">
+                    
+                <label class="option-label">
+                    <input type="radio" name="q30" value="0">
+                    <span>A. EWA disregards recent gradients</span>
+                </label>
+            
+                <label class="option-label">
+                    <input type="radio" name="q30" value="1">
+                    <span>B. EWA acts as a low-pass filter, smoothing fluctuations</span>
+                </label>
+            
+                <label class="option-label">
+                    <input type="radio" name="q30" value="2">
+                    <span>C. EWA only works for squared gradients</span>
+                </label>
+            
+                <label class="option-label">
+                    <input type="radio" name="q30" value="3">
+                    <span>D. EWA requires second-order derivatives</span>
+                </label>
+            
+                </div>
+                <div class="feedback-area" id="fb-30" style="display: flex;"><span class="feedback-correct">💡 ✓ Correct! EWA acts as a low-pass filter, smoothing fluctuations is right.</span></div>
+            </div>
+        
+            <div class="question-item" id="question-31" data-qidx="31">
+                <div class="question-text">32. In deep learning, 'bias correction' in Adam is especially important in:</div>
+                <div class="options">
+                    
+                <label class="option-label">
+                    <input type="radio" name="q31" value="0">
+                    <span>A. The later stages of training</span>
+                </label>
+            
+                <label class="option-label">
+                    <input type="radio" name="q31" value="1">
+                    <span>B. The initial iterations where moving averages are biased toward zero</span>
+                </label>
+            
+                <label class="option-label">
+                    <input type="radio" name="q31" value="2">
+                    <span>C. Only for classification tasks</span>
+                </label>
+            
+                <label class="option-label">
+                    <input type="radio" name="q31" value="3">
+                    <span>D. When using large batch sizes</span>
+                </label>
+            
+                </div>
+                <div class="feedback-area" id="fb-31" style="display: flex;"><span class="feedback-correct">💡 ✓ Correct! The initial iterations where moving averages are biased toward zero is right.</span></div>
+            </div>
+        
+            <div class="question-item" id="question-32" data-qidx="32">
+                <div class="question-text">33. What type of regularization is performed by adding a penalty term λ * ||w||₁ to the loss function?</div>
+                <div class="options">
+                    
+                <label class="option-label">
+                    <input type="radio" name="q32" value="0">
+                    <span>A. L1 regularization (sparsity)</span>
+                </label>
+            
+                <label class="option-label">
+                    <input type="radio" name="q32" value="1">
+                    <span>B. L2 regularization</span>
+                </label>
+            
+                <label class="option-label">
+                    <input type="radio" name="q32" value="2">
+                    <span>C. Dropout</span>
+                </label>
+            
+                <label class="option-label">
+                    <input type="radio" name="q32" value="3">
+                    <span>D. Early stopping</span>
+                </label>
+            
+                </div>
+                <div class="feedback-area" id="fb-32" style="display: flex;"><span class="feedback-wrong">💡 ✗ Wrong. Your answer: "L2 regularization". Correct: L1 regularization (sparsity).</span></div>
+            </div>
+        
+            <div class="question-item" id="question-33" data-qidx="33">
+                <div class="question-text">34. Which optimizer accumulates an exponentially weighted average of both gradients and squared gradients and then applies bias correction?</div>
+                <div class="options">
+                    
+                <label class="option-label">
+                    <input type="radio" name="q33" value="0">
+                    <span>A. RMSProp</span>
+                </label>
+            
+                <label class="option-label">
+                    <input type="radio" name="q33" value="1">
+                    <span>B. Momentum</span>
+                </label>
+            
+                <label class="option-label">
+                    <input type="radio" name="q33" value="2">
+                    <span>C. Adam</span>
+                </label>
+            
+                <label class="option-label">
+                    <input type="radio" name="q33" value="3">
+                    <span>D. AdaGrad</span>
+                </label>
+            
+                </div>
+                <div class="feedback-area" id="fb-33" style="display: flex;"><span class="feedback-correct">💡 ✓ Correct! Adam is right.</span></div>
+            </div>
+        
+            <div class="question-item" id="question-34" data-qidx="34">
+                <div class="question-text">35. The recommended best practice for optimizer selection mentioned in the lecture is:</div>
+                <div class="options">
+                    
+                <label class="option-label">
+                    <input type="radio" name="q34" value="0">
+                    <span>A. Always use SGD with momentum, never Adam</span>
+                </label>
+            
+                <label class="option-label">
+                    <input type="radio" name="q34" value="1">
+                    <span>B. Start with Adam, then for maximal performance try SGD with momentum + schedule</span>
+                </label>
+            
+                <label class="option-label">
+                    <input type="radio" name="q34" value="2">
+                    <span>C. Only use RMSProp for CNNs</span>
+                </label>
+            
+                <label class="option-label">
+                    <input type="radio" name="q34" value="3">
+                    <span>D. Never change default learning rate</span>
+                </label>
+            
+                </div>
+                <div class="feedback-area" id="fb-34" style="display: flex;"><span class="feedback-correct">💡 ✓ Correct! Start with Adam, then for maximal performance try SGD with momentum + schedule is right.</span></div>
+            </div>
+        
+            <div class="question-item" id="question-35" data-qidx="35">
+                <div class="question-text">36. What does the term 'plateaus' in loss surface refer to?</div>
+                <div class="options">
+                    
+                <label class="option-label">
+                    <input type="radio" name="q35" value="0">
+                    <span>A. Very steep slopes</span>
+                </label>
+            
+                <label class="option-label">
+                    <input type="radio" name="q35" value="1">
+                    <span>B. Flat regions where gradients are near zero, slowing convergence</span>
+                </label>
+            
+                <label class="option-label">
+                    <input type="radio" name="q35" value="2">
+                    <span>C. Sharp minima with high curvature</span>
+                </label>
+            
+                <label class="option-label">
+                    <input type="radio" name="q35" value="3">
+                    <span>D. Regions with chaotic gradients</span>
+                </label>
+            
+                </div>
+                <div class="feedback-area" id="fb-35" style="display: flex;"><span class="feedback-correct">💡 ✓ Correct! Flat regions where gradients are near zero, slowing convergence is right.</span></div>
+            </div>
+        
+            <div class="question-item" id="question-36" data-qidx="36">
+                <div class="question-text">37. In the RMSProp update equation: W = W - α * (dW / sqrt(S_dw + ε)), the denominator causes:</div>
+                <div class="options">
+                    
+                <label class="option-label">
+                    <input type="radio" name="q36" value="0">
+                    <span>A. Smaller updates for frequently large gradients, larger updates for small gradients</span>
+                </label>
+            
+                <label class="option-label">
+                    <input type="radio" name="q36" value="1">
+                    <span>B. Larger updates for all gradients</span>
+                </label>
+            
+                <label class="option-label">
+                    <input type="radio" name="q36" value="2">
+                    <span>C. Constant step regardless of gradient</span>
+                </label>
+            
+                <label class="option-label">
+                    <input type="radio" name="q36" value="3">
+                    <span>D. Only positive updates</span>
+                </label>
+            
+                </div>
+                <div class="feedback-area" id="fb-36" style="display: flex;"><span class="feedback-correct">💡 ✓ Correct! Smaller updates for frequently large gradients, larger updates for small gradients is right.</span></div>
+            </div>
+        
+            <div class="question-item" id="question-37" data-qidx="37">
+                <div class="question-text">38. Suppose you are tuning regularization strength λ. Why sample λ on a logarithmic scale?</div>
+                <div class="options">
+                    
+                <label class="option-label">
+                    <input type="radio" name="q37" value="0">
+                    <span>A. Because λ is always between 0 and 1</span>
+                </label>
+            
+                <label class="option-label">
+                    <input type="radio" name="q37" value="1">
+                    <span>B. Because the effect of λ is multiplicative (orders of magnitude matter)</span>
+                </label>
+            
+                <label class="option-label">
+                    <input type="radio" name="q37" value="2">
+                    <span>C. It's required by grid search</span>
+                </label>
+            
+                <label class="option-label">
+                    <input type="radio" name="q37" value="3">
+                    <span>D. To avoid negative values</span>
+                </label>
+            
+                </div>
+                <div class="feedback-area" id="fb-37" style="display: flex;"><span class="feedback-correct">💡 ✓ Correct! Because the effect of λ is multiplicative (orders of magnitude matter) is right.</span></div>
+            </div>
+        
+            <div class="question-item" id="question-38" data-qidx="38">
+                <div class="question-text">39. Which statement about the relationship between hyperparameter search and computational cost is true?</div>
+                <div class="options">
+                    
+                <label class="option-label">
+                    <input type="radio" name="q38" value="0">
+                    <span>A. Random search always requires more runs than grid search</span>
+                </label>
+            
+                <label class="option-label">
+                    <input type="radio" name="q38" value="1">
+                    <span>B. Grid search suffers from combinatorial explosion</span>
+                </label>
+            
+                <label class="option-label">
+                    <input type="radio" name="q38" value="2">
+                    <span>C. Only Bayesian optimization can tune hyperparameters</span>
+                </label>
+            
+                <label class="option-label">
+                    <input type="radio" name="q38" value="3">
+                    <span>D. Grid search is optimal for all dimensions</span>
+                </label>
+            
+                </div>
+                <div class="feedback-area" id="fb-38" style="display: flex;"><span class="feedback-correct">💡 ✓ Correct! Grid search suffers from combinatorial explosion is right.</span></div>
+            </div>
+        
+            <div class="question-item" id="question-39" data-qidx="39">
+                <div class="question-text">40. According to the slides, which of the following offers a robust balance between convergence speed, adaptive learning rates, and little hyperparameter tuning, making it the most popular optimizer?</div>
+                <div class="options">
+                    
+                <label class="option-label">
+                    <input type="radio" name="q39" value="0">
+                    <span>A. SGD</span>
+                </label>
+            
+                <label class="option-label">
+                    <input type="radio" name="q39" value="1">
+                    <span>B. Momentum</span>
+                </label>
+            
+                <label class="option-label">
+                    <input type="radio" name="q39" value="2">
+                    <span>C. RMSProp</span>
+                </label>
+            
+                <label class="option-label">
+                    <input type="radio" name="q39" value="3">
+                    <span>D. Adam</span>
+                </label>
+            
+                </div>
+                <div class="feedback-area" id="fb-39" style="display: flex;"><span class="feedback-correct">💡 ✓ Correct! Adam is right.</span></div>
+            </div>
+        </div>
+    <div class="score-panel">
+        <button class="btn-score" id="finalScoreBtn">✨ Get Final Score &amp; Feedback ✨</button>
+    </div>
+    <div id="finalScoreDisplay" class="final-score-container" style="display: block;">🏆 YOUR FINAL SCORE: 37 / 40 (93%) 🏆</div>
+    <footer>Select one answer per question. Click the button to see your total score and detailed answers feedback.</footer>
+</div>
+
+<script>
+    // ---------- 40 UNIQUE MCQ QUESTIONS covering all slides (optimizers, EWA, hyperparameter tuning, regularization, best practices) ----------
+    const quizData = [
+        { question: "What is a key limitation of standard Mini-Batch Gradient Descent?", options: ["Noisy oscillations in loss landscape", "Fixed learning rate for all parameters", "May get trapped in local minima or plateaus", "All of the above"], correct: 3 },
+        { question: "Exponentially Weighted Averages (EWA) in advanced optimizers help to:", options: ["Increase the learning rate adaptively", "Smooth out noisy gradients and reveal underlying trend", "Eliminate the need for bias correction", "Only work with RMSProp"], correct: 1 },
+        { question: "In the Momentum algorithm, the update rule uses v_dw = β v_dw + (1-β) dW. What does β control?", options: ["The learning rate decay", "Weight given to past gradients (smoothing factor)", "Second moment accumulation", "Adaptive per-parameter scaling"], correct: 1 },
+        { question: "What is a typical default value for the momentum term β (beta) in practice?", options: ["0.5", "0.99", "0.9", "0.999"], correct: 2 },
+        { question: "RMSProp (Root Mean Square Propagation) adapts learning rates by maintaining:", options: ["A moving average of raw gradients", "A moving average of squared gradients", "A moving average of weight updates", "A single global learning rate schedule"], correct: 1 },
+        { question: "In RMSProp, when a parameter has a consistently large gradient, the effective update step will:", options: ["Become larger to escape plateau", "Remain unchanged", "Be scaled down (smaller step)", "Oscillate heavily"], correct: 2 },
+        { question: "Which two optimization techniques does Adam combine to achieve robust performance?", options: ["SGD + Mini-batch", "Momentum + RMSProp", "NAG + AdaGrad", "EWA + gradient clipping"], correct: 1 },
+        { question: "In Adam, the first moment (v_dw) represents:", options: ["The exponentially weighted average of gradients (mean)", "The exponentially weighted average of squared gradients", "The bias-corrected learning rate", "The second raw moment"], correct: 0 },
+        { question: "Why does Adam include a bias correction step?", options: ["To increase learning rate after each epoch", "To correct for initial zero initialization of moments", "To prevent overfitting", "To normalize input features"], correct: 1 },
+        { question: "According to practical recommendations, what is the best default optimizer when starting a new deep learning project?", options: ["SGD with classical momentum", "RMSProp", "Adam", "AdaGrad"], correct: 2 },
+        { question: "Which of the following is true regarding Adam vs SGD with Momentum?", options: ["Adam always generalizes better on every task", "SGD with Momentum can sometimes generalize better when fine-tuned", "Adam never requires learning rate tuning", "Momentum is always faster than Adam"], correct: 1 },
+        { question: "The primary benefit of Momentum over vanilla GD is:", options: ["It eliminates local minima entirely", "It accelerates convergence and dampens oscillations", "It automatically adjusts batch size", "It works only with convex functions"], correct: 1 },
+        { question: "When framing hyperparameter tuning as optimizing a black-box function f(x), the output f(x) is typically:", options: ["The number of model parameters", "Validation accuracy or validation loss", "Training accuracy only", "Gradient norm"], correct: 1 },
+        { question: "What is the 'curse of dimensionality' in the context of Grid Search?", options: ["Models become too deep", "The number of hyperparameter combinations grows exponentially with dimensions", "Grid search uses random sampling", "Overfitting due to too many features"], correct: 1 },
+        { question: "Compared to Grid Search, Random Search is often more efficient because:", options: ["It tries every possible combination", "It explores more distinct values for important hyperparameters without wasting runs", "It uses gradient information", "It requires fewer epochs per run"], correct: 1 },
+        { question: "Why is it recommended to sample hyperparameters like learning rate on a logarithmic scale (e.g., 10^{-4} to 10^{-1})?", options: ["Because learning rates are always negative", "Because the impact of changes is multiplicative, not linear", "To reduce computational cost", "Because grid search becomes feasible"], correct: 1 },
+        { question: "Which regularization technique randomly deactivates neurons with a certain probability during training to improve generalization?", options: ["L2 regularization", "Dropout", "Early stopping", "Data augmentation"], correct: 1 },
+        { question: "L2 regularization (weight decay) works by:", options: ["Adding penalty on absolute weights", "Adding penalty on squared weights to the loss function", "Randomly dropping connections", "Stopping training early"], correct: 1 },
+        { question: "Early stopping is a regularization strategy that:", options: ["Stops training when validation performance stops improving", "Stops after fixed number of epochs", "Reduces learning rate to zero", "Increases batch size"], correct: 0 },
+        { question: "Data augmentation improves model performance by:", options: ["Increasing model size", "Adding noise to labels", "Creating modified versions of training samples to increase diversity", "Doubling the learning rate"], correct: 2 },
+        { question: "A higher β value (closer to 1) in Exponentially Weighted Averages leads to:", options: ["More noisy moving average", "Smoother moving average, more weight on past values", "Faster adaptation to recent gradients", "No effect"], correct: 1 },
+        { question: "In Momentum algorithm, the weight update formula is W = W - α * v_dw. v_dw is:", options: ["Current gradient", "Moving average of gradients", "Squared gradient average", "Bias-corrected second moment"], correct: 1 },
+        { question: "RMSProp scales the learning rate by 1 / sqrt(S_dw + ε). Here S_dw is:", options: ["Moving average of raw gradients", "Moving average of squared gradients", "Exponential decay of weights", "Current loss value"], correct: 1 },
+        { question: "The small epsilon (ε) in RMSProp and Adam is used to:", options: ["Speed up convergence", "Avoid division by zero and improve numerical stability", "Increase momentum", "Decay learning rate"], correct: 1 },
+        { question: "What is the main goal of using advanced optimizers (Momentum, RMSProp, Adam) over standard GD?", options: ["To reduce model size", "To converge faster and more reliably across loss surfaces", "To always escape all local minima", "To remove regularization"], correct: 1 },
+        { question: "Which of the following hyperparameters is NOT typically tuned during hyperparameter optimization?", options: ["Learning rate", "Number of hidden layers", "Mini-batch size", "The exact random seed of each training example (fixed after selection)"], correct: 3, note: "Random seed is generally fixed; other options are tuned." },
+        { question: "When using Grid Search, if you have 4 hyperparameters each with 5 possible values, how many model training runs are required?", options: ["20", "125", "625", "1024"], correct: 2 },
+        { question: "Random Search can be more efficient because not all hyperparameters are equally important. Which hyperparameter often has the strongest impact on performance?", options: ["Number of epochs", "Learning rate", "Dropout rate (if small variation)", "Activation function type (minor)"], correct: 1 },
+        { question: "Which component of the Adam optimizer accounts for adaptive per-parameter learning rates similar to RMSProp?", options: ["First moment estimate", "Second moment estimate (uncentered variance)", "Bias correction factor", "Momentum term only"], correct: 1 },
+        { question: "On a loss plateau where gradients are very small, RMSProp and Adam help by:", options: ["Increasing the effective step size because denominator sqrt(S_dw) is small", "Reducing step size further", "Switching to pure SGD", "Stopping training"], correct: 0 },
+        { question: "Which of the following statements about Exponentially Weighted Averages (EWA) is correct?", options: ["EWA disregards recent gradients", "EWA acts as a low-pass filter, smoothing fluctuations", "EWA only works for squared gradients", "EWA requires second-order derivatives"], correct: 1 },
+        { question: "In deep learning, 'bias correction' in Adam is especially important in:", options: ["The later stages of training", "The initial iterations where moving averages are biased toward zero", "Only for classification tasks", "When using large batch sizes"], correct: 1 },
+        { question: "What type of regularization is performed by adding a penalty term λ * ||w||₁ to the loss function?", options: ["L1 regularization (sparsity)", "L2 regularization", "Dropout", "Early stopping"], correct: 0 },
+        { question: "Which optimizer accumulates an exponentially weighted average of both gradients and squared gradients and then applies bias correction?", options: ["RMSProp", "Momentum", "Adam", "AdaGrad"], correct: 2 },
+        { question: "The recommended best practice for optimizer selection mentioned in the lecture is:", options: ["Always use SGD with momentum, never Adam", "Start with Adam, then for maximal performance try SGD with momentum + schedule", "Only use RMSProp for CNNs", "Never change default learning rate"], correct: 1 },
+        { question: "What does the term 'plateaus' in loss surface refer to?", options: ["Very steep slopes", "Flat regions where gradients are near zero, slowing convergence", "Sharp minima with high curvature", "Regions with chaotic gradients"], correct: 1 },
+        { question: "In the RMSProp update equation: W = W - α * (dW / sqrt(S_dw + ε)), the denominator causes:", options: ["Smaller updates for frequently large gradients, larger updates for small gradients", "Larger updates for all gradients", "Constant step regardless of gradient", "Only positive updates"], correct: 0 },
+        { question: "Suppose you are tuning regularization strength λ. Why sample λ on a logarithmic scale?", options: ["Because λ is always between 0 and 1", "Because the effect of λ is multiplicative (orders of magnitude matter)", "It's required by grid search", "To avoid negative values"], correct: 1 },
+        { question: "Which statement about the relationship between hyperparameter search and computational cost is true?", options: ["Random search always requires more runs than grid search", "Grid search suffers from combinatorial explosion", "Only Bayesian optimization can tune hyperparameters", "Grid search is optimal for all dimensions"], correct: 1 },
+        { question: "According to the slides, which of the following offers a robust balance between convergence speed, adaptive learning rates, and little hyperparameter tuning, making it the most popular optimizer?", options: ["SGD", "Momentum", "RMSProp", "Adam"], correct: 3 }
+    ];
+
+    // ensure exactly 40 questions (the fixed array length)
+    console.log("Quiz questions loaded:", quizData.length);
+
+    // Build the quiz dynamically
+    const container = document.getElementById('quizContainer');
+    let questionsHTML = '';
+
+    quizData.forEach((item, idx) => {
+        const qNumber = idx + 1;
+        let optionsMarkup = '';
+        item.options.forEach((opt, optIdx) => {
+            optionsMarkup += `
+                <label class="option-label">
+                    <input type="radio" name="q${idx}" value="${optIdx}">
+                    <span>${String.fromCharCode(65+optIdx)}. ${opt}</span>
+                </label>
+            `;
+        });
+        questionsHTML += `
+            <div class="question-item" id="question-${idx}" data-qidx="${idx}">
+                <div class="question-text">${qNumber}. ${item.question}</div>
+                <div class="options">
+                    ${optionsMarkup}
+                </div>
+                <div class="feedback-area" id="fb-${idx}" style="display: none;"></div>
+            </div>
+        `;
+    });
+
+    container.innerHTML = questionsHTML;
+
+    // Helper: remove all feedbacks and hide final score display (but button will re-evaluate)
+    function removeAllFeedbacks() {
+        for (let i = 0; i < quizData.length; i++) {
+            const fbDiv = document.getElementById(`fb-${i}`);
+            if (fbDiv) {
+                fbDiv.style.display = 'none';
+                fbDiv.innerHTML = '';
+            }
+        }
+        const finalDiv = document.getElementById('finalScoreDisplay');
+        if (finalDiv) finalDiv.style.display = 'none';
+    }
+
+    // show final score & compute per-question feedback (and display feedback)
+    function computeAndShowScore() {
+        let totalCorrect = 0;
+        const userSelections = []; // store selected value index or -1
+
+        // gather answers
+        for (let i = 0; i < quizData.length; i++) {
+            const selectedRadio = document.querySelector(`input[name="q${i}"]:checked`);
+            if (selectedRadio && selectedRadio.value !== undefined) {
+                const selectedVal = parseInt(selectedRadio.value);
+                userSelections.push(selectedVal);
+                if (selectedVal === quizData[i].correct) {
+                    totalCorrect++;
+                }
+            } else {
+                userSelections.push(-1); // unanswered
+            }
+        }
+
+        // update final score panel
+        const finalDiv = document.getElementById('finalScoreDisplay');
+        finalDiv.style.display = 'block';
+        finalDiv.innerHTML = `🏆 YOUR FINAL SCORE: ${totalCorrect} / ${quizData.length} (${Math.round((totalCorrect/quizData.length)*100)}%) 🏆`;
+        
+        // for each question: create feedback (correct/wrong + correct answer text)
+        for (let i = 0; i < quizData.length; i++) {
+            const fbDiv = document.getElementById(`fb-${i}`);
+            if (!fbDiv) continue;
+            
+            const isCorrect = (userSelections[i] !== -1 && userSelections[i] === quizData[i].correct);
+            const selectedIdx = userSelections[i];
+            const correctAnswerText = quizData[i].options[quizData[i].correct];
+            let feedbackText = '';
+            let feedbackClass = '';
+            
+            if (selectedIdx === -1) {
+                feedbackText = `❌ Not answered. Correct answer: ${correctAnswerText}`;
+                feedbackClass = 'feedback-wrong';
+            } else if (isCorrect) {
+                feedbackText = `✓ Correct! ${correctAnswerText} is right.`;
+                feedbackClass = 'feedback-correct';
+            } else {
+                const userAnswerText = quizData[i].options[selectedIdx];
+                feedbackText = `✗ Wrong. Your answer: "${userAnswerText}". Correct: ${correctAnswerText}.`;
+                feedbackClass = 'feedback-wrong';
+            }
+            
+            // Build feedback html
+            fbDiv.innerHTML = `<span class="${feedbackClass}">💡 ${feedbackText}</span>`;
+            fbDiv.style.display = 'flex';
+        }
+    }
+
+    // main button event: remove previous feedbacks, compute new final score, and display feedback for each answer (only then)
+    const scoreBtn = document.getElementById('finalScoreBtn');
+    scoreBtn.addEventListener('click', () => {
+        // Remove all currently displayed feedback (in case any existing from previous click)
+        for (let i = 0; i < quizData.length; i++) {
+            const fbDiv = document.getElementById(`fb-${i}`);
+            if (fbDiv) {
+                fbDiv.style.display = 'none';
+                fbDiv.innerHTML = '';
+            }
+        }
+        // Recompute everything (score + per-question feedback displayed)
+        computeAndShowScore();
+        // optional: smooth scroll to score panel
+        document.getElementById('finalScoreDisplay')?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    });
+
+    // (optional) provide initial state: no feedback anywhere, no final score shown.
+    // Ensure that on page load everything is clean (feedback hidden, final score hidden)
+    window.addEventListener('DOMContentLoaded', () => {
+        removeAllFeedbacks();
+        // Also set any stray final display hidden
+        const finalDiv = document.getElementById('finalScoreDisplay');
+        if (finalDiv) finalDiv.style.display = 'none';
+    });
+</script>
+
+</body></html>

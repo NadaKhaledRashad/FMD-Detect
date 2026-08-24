@@ -1,0 +1,19 @@
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+.env
+
+.venv/
+venv/
+
+test.py
+
+.DS_Store
+
+# Data files
+data/
+
+# Model files
+models/
