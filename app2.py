@@ -1606,18 +1606,6 @@ with centered_section("diagnosis-section"):
                                 </div>
                             </div>
                         </div>
-                        <div class="vet-box vet-summary">
-                            <h4>📋 Summary</h4>
-                            <p>
-                                {reason.replace(chr(10), "<br>")}
-                            </p>
-                        </div>
-                        <div class="vet-box vet-actions">
-                            <h4>✅ Recommended Actions</h4>
-                            <p>
-                                {action.replace(chr(10), "<br>")}
-                            </p>
-                        </div>
                         <div class="vet-box vet-contact">
                             <h4>☎ Contact</h4>
                             <p>
