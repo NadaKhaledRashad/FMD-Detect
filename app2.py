@@ -44,6 +44,7 @@ def toggle_lang():
 
 import base64
 
+@st.cache_data
 def get_base64(image_path):
     with open(BASE_DIR / image_path, "rb") as img_file:
         return base64.b64encode(img_file.read()).decode("utf-8")
@@ -89,13 +90,18 @@ hero_background = hero_images[st.session_state.hero_index]["data"]
 # =========================
 # 2. تحميل CSS الخارجي + التصميم الجديد
 # =========================
-def load_css(file_path):
+@st.cache_data
+def get_css(file_path):
     try:
         with open(file_path, "r", encoding="utf-8") as f:
-            css = f.read()
-        st.markdown(f"<style>{css}</style>", unsafe_allow_html=True)
+            return f.read()
     except FileNotFoundError:
-        pass
+        return ""
+
+def load_css(file_path):
+    css = get_css(file_path)
+    if css:
+        st.markdown(f"<style>{css}</style>", unsafe_allow_html=True)
 
 load_css(BASE_DIR / "styles" / "main.css")
 # =========================
@@ -759,6 +765,7 @@ div[data-testid="stForm"] {{
 div[role="radiogroup"] label p{{
     font-size:18px !important;
     font-weight:500;
+    color: #1E4D2B !important;
 }}
 div[data-baseweb="select"]{{
     font-size:18px;

@@ -2,6 +2,7 @@ from pathlib import Path
 import tensorflow as tf
 import numpy as np
 from tensorflow.keras.preprocessing import image
+import streamlit as st
 
 # =====================
 # PROJECT PATH
@@ -15,16 +16,18 @@ MODEL_PATH = BASE_DIR / "models" / "fmd_efficientnet_model.keras"
 # LOAD IMAGE MODEL
 # =====================
 
-print("Before loading model...")
-
-image_model = tf.keras.models.load_model(MODEL_PATH)
-
-print("Model loaded successfully!")
+@st.cache_resource
+def load_image_model():
+    print("Before loading image model...")
+    model = tf.keras.models.load_model(MODEL_PATH)
+    print("Model loaded successfully!")
+    return model
 # =====================
 # IMAGE PREDICTION
 # =====================
 
 def predict_image(uploaded_file):
+    image_model = load_image_model()
 
     img = image.load_img(
         uploaded_file,

@@ -1,10 +1,12 @@
 from pathlib import Path
 import pandas as pd
+import streamlit as st
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 QUESTION_FILE = BASE_DIR / "data" / "chatbot_questions.xlsx"
 
+@st.cache_data
 def load_questions():
 
     df = pd.read_excel(QUESTION_FILE)

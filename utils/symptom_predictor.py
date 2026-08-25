@@ -1,6 +1,7 @@
 from pathlib import Path
 import pandas as pd
 import joblib
+import streamlit as st
 
 # =====================
 # PROJECT PATH
@@ -13,26 +14,30 @@ MODELS_DIR = BASE_DIR / "models"
 # LOAD MODELS
 # =====================
 
-stack_model = joblib.load(
-    MODELS_DIR / "fmd_model_stacking (1).pkl"
-)
-
-encoder_dict = joblib.load(
-    MODELS_DIR / "fmd_encoders (2).pkl"
-)
-
-animal_cols = joblib.load(
-    MODELS_DIR / "fmd_animal_cols (2).pkl"
-)
-
-FINAL_THRESHOLD = joblib.load(
-    MODELS_DIR / "fmd_threshold (2).pkl"
-)
+@st.cache_resource
+def load_symptom_models():
+    stack_model = joblib.load(
+        MODELS_DIR / "fmd_model_stacking (1).pkl"
+    )
+    
+    encoder_dict = joblib.load(
+        MODELS_DIR / "fmd_encoders (2).pkl"
+    )
+    
+    animal_cols = joblib.load(
+        MODELS_DIR / "fmd_animal_cols (2).pkl"
+    )
+    
+    FINAL_THRESHOLD = joblib.load(
+        MODELS_DIR / "fmd_threshold (2).pkl"
+    )
+    return stack_model, encoder_dict, animal_cols, FINAL_THRESHOLD
 # =====================
 # PREDICTION FUNCTION
 # =====================
 
 def predict_symptoms(answers):
+    stack_model, encoder_dict, animal_cols, FINAL_THRESHOLD = load_symptom_models()
 
     print(answers)
 
