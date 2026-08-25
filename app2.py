@@ -250,6 +250,7 @@ div.block-container {{
     margin: 0 auto;
     padding: 0.65rem 2rem;
     gap: 1rem;
+    flex-wrap: nowrap !important;
 }}
 .nav-logo {{
     font-weight: 800;
@@ -294,6 +295,13 @@ div.block-container {{
 }}
 @media (max-width: 860px) {{
     .nav-links {{ display: none; }}
+    .st-key-site-nav [data-testid="stHorizontalBlock"] {{
+        flex-direction: row !important;
+        justify-content: space-between !important;
+    }}
+    .st-key-site-nav [data-testid="column"]:nth-child(2) {{
+        display: none !important;
+    }}
 }}
 
 /* ===== HERO SECTION ===== */
@@ -359,7 +367,7 @@ div.block-container {{
     padding-top: 70px; /* breathing room under the fixed nav bar */
 }}
 .hero-title {{
-    font-size: 5.5rem;
+    font-size: clamp(2.5rem, 8vw, 5.5rem);
     font-weight: 900;
     color: #FFFFFF;
     letter-spacing: 2px;
@@ -367,14 +375,14 @@ div.block-container {{
     margin-bottom: 0.2rem;
 }}
 .hero-slogan {{
-    font-size: 2.2rem;
+    font-size: clamp(1.2rem, 4vw, 2.2rem);
     font-weight: 700;
     color: #E8F5E9;
     margin-bottom: 0.5rem;
     letter-spacing: 1px;
 }}
 .hero-sub {{
-    font-size: var(--fs-lg);
+    font-size: clamp(1rem, 3vw, var(--fs-lg));
     color: #C8E6C9;
     font-weight: 400;
     margin-bottom: 2rem;
@@ -405,7 +413,7 @@ div.block-container {{
     text-align: center;
 }}
 .about-title {{
-    font-size: var(--fs-2xl);
+    font-size: clamp(1.8rem, 5vw, var(--fs-2xl));
     color: var(--brand-dark);
     font-weight: 800;
     margin-bottom: var(--space-sm);
@@ -486,7 +494,7 @@ div.block-container {{
 }}
 .tips-title {{
     color: #174D2C;
-    font-size: var(--fs-2xl);
+    font-size: clamp(1.8rem, 5vw, var(--fs-2xl));
     font-weight: 800;
     text-align: center;
     letter-spacing: 3px;
@@ -798,7 +806,7 @@ div[data-testid="stForm"] button[kind="primary"] {{
     justify-content: center !important;
     align-items: center !important;
     gap: 12px !important;
-    flex-wrap: nowrap !important;
+    flex-wrap: wrap !important;
     width: auto !important;
 }}
 .st-key-result-action-buttons [data-testid="stColumn"],
@@ -826,7 +834,7 @@ div[data-testid="stForm"] button[kind="primary"] {{
 
 /* نتيجة التشخيص - بطاقة بأسلوب مرجعى */
 .result-verdict {{
-    font-size: 3rem;
+    font-size: clamp(2rem, 6vw, 3rem);
     font-weight: 900;
     margin-bottom: 1.5rem;
 }}
