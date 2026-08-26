@@ -80,7 +80,7 @@ tips_3 = tips_images[2]
 # ================================
 # شعار النافبار (Logo)
 # ================================
-LOGO_IMAGE_FILE = ("asset/logo.png", "image/png")
+LOGO_IMAGE_FILE = ("asset/logo.jpeg", "image/jpeg")
 logo_image = {"data": get_base64(LOGO_IMAGE_FILE[0]), "mime": LOGO_IMAGE_FILE[1]}
 
 if "hero_index" not in st.session_state:
