@@ -107,8 +107,8 @@ TRANSLATIONS = {
             "bell_show": "🔔 Show Recommendation",
             "bell_hide": "🔔 Hide Recommendation",
             "verdicts": {
-                "healthy": "Healthy",
-                "suspected": "Suspected",
+                "healthy": "NOT FMD",
+                "suspected": "FMD",
                 "infected": "Infected",
             },
         },
